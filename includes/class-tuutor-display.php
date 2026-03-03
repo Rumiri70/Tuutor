@@ -89,6 +89,8 @@ class Tuutor_Display
                                         echo wp_kses_post($col['content']);
                                     } else if ($col['type'] === 'image') {
                                         echo '<img src="' . esc_url($col['url']) . '" alt="' . esc_attr($col['alt'] ?? '') . '">';
+                                    } else if ($col['type'] === 'accordion' && !empty($col['items'])) {
+                                        $this->render_accordion($col['items']);
                                     }
                                     echo '</div>';
                                 }

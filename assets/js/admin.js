@@ -64,9 +64,25 @@
 
             this.$root.on('click', '.tuutor-add-accordion-item', function (e) {
                 e.preventDefault();
-                const blockIdx = $(this).closest('.tuutor-block-item').index();
+                const $btn = $(this);
+                const blockIdx = $btn.closest('.tuutor-block-item').index();
+                const $col = $btn.closest('.tuutor-grid-col-editor');
                 self.syncState();
-                self.addAccordionItem(blockIdx);
+
+                if ($col.length) {
+                    const colIdx = $col.index();
+                    self.addAccordionItem(blockIdx, colIdx);
+                } else {
+                    self.addAccordionItem(blockIdx);
+                }
+            });
+
+            this.$root.on('click', '.tuutor-remove-accordion-item', function (e) {
+                e.preventDefault();
+                // We'll let syncState handle the removal indirectly or just re-render
+                $(this).closest('.tuutor-accordion-editor-item').remove();
+                self.syncState();
+                self.render();
             });
 
             this.$root.on('click', '.tuutor-page-link', function (e) {
@@ -85,9 +101,15 @@
                 if (type === 'text') {
                     $col.find('.tuutor-grid-col-text-area').show();
                     $col.find('.tuutor-grid-col-image-area').hide();
-                } else {
+                    $col.find('.tuutor-grid-col-accordion-area').hide();
+                } else if (type === 'image') {
                     $col.find('.tuutor-grid-col-text-area').hide();
                     $col.find('.tuutor-grid-col-image-area').show();
+                    $col.find('.tuutor-grid-col-accordion-area').hide();
+                } else {
+                    $col.find('.tuutor-grid-col-text-area').hide();
+                    $col.find('.tuutor-grid-col-image-area').hide();
+                    $col.find('.tuutor-grid-col-accordion-area').show();
                 }
             });
 
@@ -321,6 +343,7 @@
                                             <select class="tuutor-grid-type-select">
                                                 <option value="text" ${col.type === 'text' ? 'selected' : ''}>Text</option>
                                                 <option value="image" ${col.type === 'image' ? 'selected' : ''}>Image</option>
+                                                <option value="accordion" ${col.type === 'accordion' ? 'selected' : ''}>Accordion</option>
                                             </select>
                                         </div>
                                         
@@ -335,6 +358,19 @@
                                             <div style="margin-top:5px;">
                                                 <input type="text" class="tuutor-grid-input" data-field="alt" placeholder="Alt text" value="${col.alt || ''}">
                                             </div>
+                                        </div>
+
+                                        <div class="tuutor-grid-col-accordion-area" style="${col.type === 'accordion' ? '' : 'display:none'}">
+                                            <div class="tuutor-accordion-items-container">
+                                                ${(col.items || []).map((item, iIdx) => `
+                                                    <div class="tuutor-accordion-editor-item">
+                                                        <input type="text" class="tuutor-grid-acc-input" data-field="title" value="${item.title || ''}" placeholder="Title" style="width:100%; margin-bottom:5px;">
+                                                        <textarea class="tuutor-grid-acc-input" data-field="content" placeholder="Content" style="width:100%">${item.content || ''}</textarea>
+                                                        <button type="button" class="tuutor-btn tuutor-btn-danger tuutor-remove-accordion-item" style="margin-top:5px; padding:2px 5px;">Remove</button>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                            <button type="button" class="tuutor-btn tuutor-add-accordion-item">+ Add Item</button>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -382,11 +418,15 @@
             this.render();
         },
 
-        addAccordionItem: function (blockIdx) {
-            if (!this.state.currentTraining.blocks[blockIdx].items) {
-                this.state.currentTraining.blocks[blockIdx].items = [];
+        addAccordionItem: function (blockIdx, colIdx = null) {
+            let block = this.state.currentTraining.blocks[blockIdx];
+            if (colIdx !== null) {
+                if (!block.columns[colIdx].items) block.columns[colIdx].items = [];
+                block.columns[colIdx].items.push({ title: '', content: '' });
+            } else {
+                if (!block.items) block.items = [];
+                block.items.push({ title: '', content: '' });
             }
-            this.state.currentTraining.blocks[blockIdx].items.push({ title: '', content: '' });
             this.render();
         },
 
@@ -492,9 +532,17 @@
                         const col = { type: colType };
                         if (colType === 'text') {
                             col.content = $(this).find('.tuutor-grid-input[data-field="content"]').val();
-                        } else {
+                        } else if (colType === 'image') {
                             col.url = $(this).find('.tuutor-grid-input[data-field="url"]').val();
                             col.alt = $(this).find('.tuutor-grid-input[data-field="alt"]').val();
+                        } else {
+                            col.items = [];
+                            $(this).find('.tuutor-accordion-editor-item').each(function () {
+                                col.items.push({
+                                    title: $(this).find('.tuutor-grid-acc-input[data-field="title"]').val(),
+                                    content: $(this).find('.tuutor-grid-acc-input[data-field="content"]').val()
+                                });
+                            });
                         }
                         block.columns.push(col);
                     });
