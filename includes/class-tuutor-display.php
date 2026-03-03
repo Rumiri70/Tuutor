@@ -81,6 +81,19 @@ class Tuutor_Display
                             case 'accordion':
                                 $this->render_accordion($block['items']);
                                 break;
+                            case 'grid':
+                                echo '<div class="tuutor-grid-row">';
+                                foreach ($block['columns'] as $col) {
+                                    echo '<div class="tuutor-grid-col">';
+                                    if ($col['type'] === 'text') {
+                                        echo wp_kses_post($col['content']);
+                                    } else if ($col['type'] === 'image') {
+                                        echo '<img src="' . esc_url($col['url']) . '" alt="' . esc_attr($col['alt'] ?? '') . '">';
+                                    }
+                                    echo '</div>';
+                                }
+                                echo '</div>';
+                                break;
                         }
                         ?>
                     </div>

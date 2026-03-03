@@ -53,26 +53,143 @@
     color: #fff;
 }
 
-/* List Table Styles */
-.tuutor-trainings-list {
-    width: 100%;
+/* List Table Styles - Redesigned for Compactness */
+.tuutor-list-container {
     background: #fff;
     border: 1px solid var(--tuutor-admin-border);
-    border-collapse: collapse;
     border-radius: var(--tuutor-admin-radius);
     overflow: hidden;
+    box-shadow: var(--tuutor-admin-shadow);
 }
 
-.tuutor-trainings-list th,
-.tuutor-trainings-list td {
-    text-align: left;
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--tuutor-admin-border);
-}
-
-.tuutor-trainings-list th {
+.tuutor-list-header {
+    display: flex;
     background: #f8f9fa;
+    padding: 10px 20px;
     font-weight: 600;
+    border-bottom: 1px solid var(--tuutor-admin-border);
+    font-size: 13px;
+    color: #666;
+}
+
+.tuutor-list-row {
+    display: flex;
+    padding: 12px 20px;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f1;
+    transition: background 0.1s;
+}
+
+.tuutor-list-row:last-child {
+    border-bottom: none;
+}
+
+.tuutor-list-row:hover {
+    background: #f9f9fb;
+}
+
+.tuutor-col-id {
+    width: 60px;
+    color: #888;
+    font-size: 12px;
+}
+
+.tuutor-col-title {
+    flex: 1;
+}
+
+.tuutor-col-status {
+    width: 120px;
+}
+
+.tuutor-col-actions {
+    width: 150px;
+    text-align: right;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.tuutor-row-meta {
+    font-size: 11px;
+    color: #a4afb7;
+    margin-top: 2px;
+}
+
+.tuutor-status-badge {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.tuutor-status-published {
+    background: #e7f9ed;
+    color: #22a347;
+    border: 1px solid #c3e6cb;
+}
+
+.tuutor-status-draft {
+    background: #fff8e5;
+    color: #b25e09;
+    border: 1px solid #ffeeba;
+}
+
+.tuutor-icon-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid var(--tuutor-admin-border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.tuutor-icon-btn:hover {
+    border-color: var(--tuutor-admin-primary);
+    color: var(--tuutor-admin-primary);
+    background: #f0f7ff;
+}
+
+.tuutor-icon-btn.tuutor-btn-danger:hover {
+    border-color: var(--tuutor-admin-danger);
+    color: var(--tuutor-admin-danger);
+    background: #fff5f5;
+}
+
+/* Grid Editor Styles */
+.tuutor-grid-editor {
+    padding: 5px;
+}
+
+.tuutor-grid-col-editor {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.tuutor-grid-col-editor select {
+    font-size: 12px;
+    padding: 4px 8px;
+    margin-bottom: 10px;
+}
+
+.tuutor-grid-input {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 13px;
+}
+
+.tuutor-grid-col-text-area textarea {
+    min-height: 80px;
+    resize: vertical;
 }
 
 /* Editor Styles */

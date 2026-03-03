@@ -46,13 +46,37 @@
                 e.preventDefault();
                 const $btn = $(this);
                 const blockIdx = $btn.closest('.tuutor-block-item').index();
-                self.openMediaLib(blockIdx);
+
+                // Check if it's inside a grid column
+                const $col = $btn.closest('.tuutor-grid-col-editor');
+                if ($col.length) {
+                    const colIdx = $col.index();
+                    self.openMediaLib(blockIdx, colIdx);
+                } else {
+                    self.openMediaLib(blockIdx);
+                }
             });
 
             this.$root.on('click', '.tuutor-add-accordion-item', function (e) {
                 e.preventDefault();
                 const blockIdx = $(this).closest('.tuutor-block-item').index();
                 self.addAccordionItem(blockIdx);
+            });
+
+            this.$root.on('change', '.tuutor-grid-type-select', function () {
+                // We don't necessarily need to re-render for every change if we scrape the DOM on save,
+                // but for grid type, we need to show/hide inputs.
+                const $block = $(this).closest('.tuutor-block-item');
+                const $col = $(this).closest('.tuutor-grid-col-editor');
+                const type = $(this).val();
+
+                if (type === 'text') {
+                    $col.find('.tuutor-grid-col-text-area').show();
+                    $col.find('.tuutor-grid-col-image-area').hide();
+                } else {
+                    $col.find('.tuutor-grid-col-text-area').hide();
+                    $col.find('.tuutor-grid-col-image-area').show();
+                }
             });
 
             this.$root.on('submit', '#tuutor-training-form', function (e) {
@@ -125,41 +149,45 @@
         renderList: function () {
             let html = `
                 <div class="tuutor-admin-header">
-                    <h2>Available Trainings</h2>
-                    <button class="tuutor-btn tuutor-btn-primary tuutor-btn-action" data-action="create">Add New Training</button>
+                    <h2>Trainings Management</h2>
+                    <button class="tuutor-btn tuutor-btn-primary tuutor-btn-action" data-action="create">+ Add Training</button>
                 </div>
-                <table class="tuutor-trainings-list">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="tuutor-list-container">
+                    <div class="tuutor-list-header">
+                        <div class="tuutor-col-id">ID</div>
+                        <div class="tuutor-col-title">Training Title</div>
+                        <div class="tuutor-col-status">Status</div>
+                        <div class="tuutor-col-actions">Actions</div>
+                    </div>
+                    <div class="tuutor-list-body">
             `;
 
             if (this.state.trainings.length === 0) {
-                html += '<tr><td colspan="4">No trainings found.</td></tr>';
+                html += '<div class="tuutor-list-row-empty">No trainings found. Create your first one above!</div>';
             } else {
                 this.state.trainings.forEach(t => {
+                    const statusClass = t.status === 'publish' ? 'tuutor-status-published' : 'tuutor-status-draft';
                     html += `
-                        <tr>
-                            <td>${t.id}</td>
-                            <td><strong>${t.title}</strong></td>
-                            <td>${t.status}</td>
-                            <td class="tuutor-actions">
-                                <a href="#" class="tuutor-btn-action" data-action="edit" data-id="${t.id}">Edit</a> | 
-                                <a href="${t.permalink}" target="_blank">View</a> | 
-                                <a href="#" class="tuutor-btn-action tuutor-btn-danger" data-action="delete" data-id="${t.id}">Delete</a>
-                            </td>
-                        </tr>
+                        <div class="tuutor-list-row">
+                            <div class="tuutor-col-id">#${t.id}</div>
+                            <div class="tuutor-col-title">
+                                <strong>${t.title}</strong>
+                                <div class="tuutor-row-meta">Tutor LMS Course</div>
+                            </div>
+                            <div class="tuutor-col-status">
+                                <span class="tuutor-status-badge ${statusClass}">${t.status}</span>
+                            </div>
+                            <div class="tuutor-col-actions">
+                                <a href="#" class="tuutor-btn-action tuutor-icon-btn" data-action="edit" data-id="${t.id}" title="Edit">✎</a>
+                                <a href="${t.permalink}" target="_blank" class="tuutor-icon-btn" title="View">👁</a>
+                                <a href="#" class="tuutor-btn-action tuutor-icon-btn tuutor-btn-danger" data-action="delete" data-id="${t.id}" title="Delete">🗑</a>
+                            </div>
+                        </div>
                     `;
                 });
             }
 
-            html += '</tbody></table>';
+            html += '</div></div>';
             this.$root.html(html);
         },
 
@@ -198,6 +226,7 @@
                                 <span>Add Block:</span>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="text">+ Text</button>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="image">+ Image</button>
+                                <button type="button" class="tuutor-btn tuutor-add-block" data-type="grid">+ Grid (2 Col)</button>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="accordion">+ Accordion</button>
                                 <div class="tuutor-save-controls" style="margin-left: auto;">
                                     <button type="submit" class="tuutor-btn tuutor-btn-primary">Save Training</button>
@@ -237,6 +266,37 @@
                             </div>
                         </div>
                     `;
+                } else if (b.type === 'grid') {
+                    blockHtml += `
+                        <div class="tuutor-grid-editor">
+                            <div class="tuutor-grid-columns" style="display:flex; gap:15px;">
+                                ${(b.columns || [{ type: 'text' }, { type: 'image' }]).map((col, cIdx) => `
+                                    <div class="tuutor-grid-col-editor" style="flex:1; border:1px solid #eee; padding:10px; border-radius:4px; background:#fff;">
+                                        <div style="margin-bottom:10px;">
+                                            <label>Column ${cIdx + 1} Type:</label>
+                                            <select class="tuutor-grid-type-select">
+                                                <option value="text" ${col.type === 'text' ? 'selected' : ''}>Text</option>
+                                                <option value="image" ${col.type === 'image' ? 'selected' : ''}>Image</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="tuutor-grid-col-text-area" style="${col.type === 'text' ? '' : 'display:none'}">
+                                            <textarea class="tuutor-grid-input" data-field="content" placeholder="Text for column ${cIdx + 1}">${col.content || ''}</textarea>
+                                        </div>
+                                        
+                                        <div class="tuutor-grid-col-image-area" style="${col.type === 'image' ? '' : 'display:none'}">
+                                            <img src="${col.url || ''}" class="tuutor-image-preview" style="${col.url ? '' : 'display:none'}">
+                                            <input type="hidden" class="tuutor-grid-input" data-field="url" value="${col.url || ''}">
+                                            <button type="button" class="tuutor-btn tuutor-media-upload">Choose Image</button>
+                                            <div style="margin-top:5px;">
+                                                <input type="text" class="tuutor-grid-input" data-field="alt" placeholder="Alt text" value="${col.alt || ''}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
                 } else if (b.type === 'accordion') {
                     blockHtml += `
                         <div class="tuutor-accordion-editor">
@@ -263,6 +323,7 @@
         addBlock: function (type) {
             const block = { type: type };
             if (type === 'accordion') block.items = [{ title: '', content: '' }];
+            if (type === 'grid') block.columns = [{ type: 'text', content: '' }, { type: 'image', url: '', alt: '' }];
             if (type === 'image') { block.url = ''; block.width = '100%'; block.alt = ''; }
             if (type === 'text') block.content = '';
 
@@ -283,7 +344,7 @@
             this.render();
         },
 
-        openMediaLib: function (blockIdx) {
+        openMediaLib: function (blockIdx, colIdx = null) {
             const self = this;
             const frame = wp.media({
                 title: 'Select or Upload Image',
@@ -293,8 +354,16 @@
 
             frame.on('select', function () {
                 const attachment = frame.state().get('selection').first().toJSON();
-                self.state.currentTraining.blocks[blockIdx].url = attachment.url;
-                self.render();
+                if (colIdx !== null) {
+                    // Update grid column
+                    const $block = $('.tuutor-block-item').eq(blockIdx);
+                    const $col = $block.find('.tuutor-grid-col-editor').eq(colIdx);
+                    $col.find('input[data-field="url"]').val(attachment.url);
+                    $col.find('.tuutor-image-preview').attr('src', attachment.url).show();
+                } else {
+                    self.state.currentTraining.blocks[blockIdx].url = attachment.url;
+                    self.render();
+                }
             });
 
             frame.open();
@@ -329,6 +398,19 @@
                     block.url = $(this).find('.tuutor-block-input[data-field="url"]').val();
                     block.width = $(this).find('.tuutor-block-input[data-field="width"]').val();
                     block.alt = $(this).find('.tuutor-block-input[data-field="alt"]').val();
+                } else if (type === 'grid') {
+                    block.columns = [];
+                    $(this).find('.tuutor-grid-col-editor').each(function () {
+                        const colType = $(this).find('.tuutor-grid-type-select').val();
+                        const col = { type: colType };
+                        if (colType === 'text') {
+                            col.content = $(this).find('.tuutor-grid-input[data-field="content"]').val();
+                        } else {
+                            col.url = $(this).find('.tuutor-grid-input[data-field="url"]').val();
+                            col.alt = $(this).find('.tuutor-grid-input[data-field="alt"]').val();
+                        }
+                        block.columns.push(col);
+                    });
                 } else if (type === 'accordion') {
                     block.items = [];
                     $(this).find('.tuutor-accordion-editor-item').each(function () {
