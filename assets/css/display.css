@@ -1,0 +1,178 @@
+:root {
+	--tuutor-primary: #2563eb;
+	--tuutor-primary-hover: #1e40af;
+	--tuutor-bg: #f8fafc;
+	--tuutor-card-bg: #ffffff;
+	--tuutor-text: #1e293b;
+	--tuutor-text-muted: #64748b;
+	--tuutor-border: #e2e8f0;
+	--tuutor-radius: 12px;
+	--tuutor-font: 'Inter', system-ui, -apple-system, sans-serif;
+	--tuutor-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	--tuutor-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.tuutor-premium-display {
+	font-family: var(--tuutor-font);
+	color: var(--tuutor-text);
+	line-height: 1.6;
+	max-width: 900px;
+	margin: 2rem auto;
+	padding: 2.5rem;
+	background: var(--tuutor-card-bg);
+	border-radius: var(--tuutor-radius);
+	box-shadow: var(--tuutor-shadow-lg);
+	border: 1px solid var(--tuutor-border);
+}
+
+.tuutor-header {
+	margin-bottom: 3rem;
+	border-bottom: 2px solid var(--tuutor-bg);
+	padding-bottom: 2rem;
+}
+
+.tuutor-header h1 {
+	font-size: 2.5rem;
+	font-weight: 800;
+	color: var(--tuutor-primary);
+	margin: 0.5rem 0;
+	line-height: 1.2;
+}
+
+.tuutor-category-badges {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.tuutor-badge {
+	background: var(--tuutor-bg);
+	color: var(--tuutor-primary);
+	padding: 0.25rem 0.75rem;
+	border-radius: 9999px;
+	font-size: 14px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.025em;
+	border: 1px solid var(--tuutor-border);
+}
+
+.tuutor-content-blocks {
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
+}
+
+.tuutor-block {
+	transition: transform 0.2s ease-in-out;
+}
+
+.tuutor-block img {
+	border-radius: var(--tuutor-radius);
+	box-shadow: var(--tuutor-shadow);
+	transition: transform 0.3s ease;
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+}
+
+.tuutor-block img:hover {
+	transform: scale(1.02);
+}
+
+/* Accordion Styles */
+.tuutor-accordion-group {
+	border: 1px solid var(--tuutor-border);
+	border-radius: var(--tuutor-radius);
+	overflow: hidden;
+}
+
+.tuutor-accordion-item {
+	border-bottom: 1px solid var(--tuutor-border);
+}
+
+.tuutor-accordion-item:last-child {
+	border-bottom: none;
+}
+
+.tuutor-accordion-trigger {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1.25rem 1.5rem;
+	background: #fff;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--tuutor-text);
+	transition: background 0.2s ease;
+}
+
+.tuutor-accordion-trigger:hover {
+	background: var(--tuutor-bg);
+}
+
+.tuutor-accordion-trigger[aria-expanded="true"] {
+	background: var(--tuutor-bg);
+	color: var(--tuutor-primary);
+}
+
+.tuutor-accordion-icon {
+	width: 24px;
+	height: 24px;
+	position: relative;
+	transition: transform 0.3s ease;
+}
+
+.tuutor-accordion-icon::before,
+.tuutor-accordion-icon::after {
+	content: '';
+	position: absolute;
+	background: currentColor;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.tuutor-accordion-icon::before {
+	width: 14px;
+	height: 2px;
+}
+
+.tuutor-accordion-icon::after {
+	width: 2px;
+	height: 14px;
+}
+
+.tuutor-accordion-trigger[aria-expanded="true"] .tuutor-accordion-icon {
+	transform: rotate(45deg);
+}
+
+.tuutor-accordion-content {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	background: #fff;
+}
+
+.tuutor-accordion-inner {
+	padding: 1.5rem;
+	color: var(--tuutor-text-muted);
+	font-size: 16px;
+	border-top: 1px solid var(--tuutor-border);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.tuutor-premium-display {
+		padding: 1.5rem;
+		margin: 1rem;
+	}
+
+	.tuutor-header h1 {
+		font-size: 1.75rem;
+	}
+}

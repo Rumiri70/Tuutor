@@ -1,0 +1,193 @@
+:root {
+    --tuutor-admin-primary: #2271b1;
+    --tuutor-admin-accent: #154e7d;
+    --tuutor-admin-danger: #d63638;
+    --tuutor-admin-bg: #f0f0f1;
+    --tuutor-admin-card: #ffffff;
+    --tuutor-admin-border: #ccd0d4;
+    --tuutor-admin-radius: 8px;
+    --tuutor-admin-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+}
+
+#tuutor-app-root {
+    margin-top: 20px;
+    max-width: 1200px;
+}
+
+.tuutor-admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tuutor-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: var(--tuutor-admin-radius);
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid var(--tuutor-admin-border);
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.tuutor-btn-primary {
+    background: var(--tuutor-admin-primary);
+    color: #fff;
+    border-color: var(--tuutor-admin-primary);
+}
+
+.tuutor-btn-primary:hover {
+    background: var(--tuutor-admin-accent);
+}
+
+.tuutor-btn-danger {
+    color: var(--tuutor-admin-danger);
+}
+
+.tuutor-btn-danger:hover {
+    background: var(--tuutor-admin-danger);
+    color: #fff;
+}
+
+/* List Table Styles */
+.tuutor-trainings-list {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--tuutor-admin-border);
+    border-collapse: collapse;
+    border-radius: var(--tuutor-admin-radius);
+    overflow: hidden;
+}
+
+.tuutor-trainings-list th,
+.tuutor-trainings-list td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--tuutor-admin-border);
+}
+
+.tuutor-trainings-list th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+/* Editor Styles */
+.tuutor-editor-container {
+    background: #fff;
+    padding: 25px;
+    border: 1px solid var(--tuutor-admin-border);
+    border-radius: var(--tuutor-admin-radius);
+    box-shadow: var(--tuutor-admin-shadow);
+}
+
+.tuutor-form-group {
+    margin-bottom: 20px;
+}
+
+.tuutor-form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.tuutor-form-group input[type="text"],
+.tuutor-form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--tuutor-admin-border);
+    border-radius: 4px;
+}
+
+/* My Blocks Builder */
+.tuutor-blocks-builder {
+    margin-top: 30px;
+    border-top: 1.5px dashed var(--tuutor-admin-border);
+    padding-top: 20px;
+}
+
+.tuutor-block-item {
+    background: #f9f9f9;
+    border: 1px solid var(--tuutor-admin-border);
+    border-radius: var(--tuutor-admin-radius);
+    margin-bottom: 15px;
+    padding: 15px;
+    position: relative;
+}
+
+.tuutor-block-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tuutor-block-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.tuutor-block-content-area textarea {
+    width: 100%;
+    min-height: 100px;
+}
+
+.tuutor-image-preview {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.tuutor-accordion-editor-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.tuutor-builder-footer {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.tuutor-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    font-size: 1.2rem;
+}
+
+.tuutor-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.tuutor-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}

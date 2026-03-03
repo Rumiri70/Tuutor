@@ -1,0 +1,132 @@
+<?php
+/**
+ * Display Class for Tuutor Custom Manager
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class Tuutor_Display
+{
+
+    public function __construct()
+    {
+        add_filter('the_content', array($this, 'filter_course_content'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+    }
+
+    /**
+     * Filter the content of courses to use our custom block layout
+     */
+    public function filter_course_content($content)
+    {
+        if (!is_singular('courses')) {
+            return $content;
+        }
+
+        $post_id = get_the_ID();
+        $blocks_json = get_post_meta($post_id, '_tuutor_custom_blocks', true);
+
+        if (empty($blocks_json)) {
+            return $content; // Fallback to default if no custom blocks
+        }
+
+        $blocks = json_decode($blocks_json, true);
+        if (!is_array($blocks)) {
+            return $content;
+        }
+
+        ob_start();
+        $this->render_custom_ui($blocks);
+        return ob_get_clean();
+    }
+
+    /**
+     * Render the custom UI based on blocks
+     */
+    protected function render_custom_ui($blocks)
+    {
+        ?>
+        <div class="tuutor-premium-display">
+            <header class="tuutor-header">
+                <div class="tuutor-category-badges">
+                    <?php
+                    $terms = get_the_terms(get_the_ID(), 'course-category');
+                    if ($terms && !is_wp_error($terms)) {
+                        foreach ($terms as $term) {
+                            echo '<span class="tuutor-badge">' . esc_html($term->name) . '</span>';
+                        }
+                    }
+                    ?>
+                </div>
+                <h1>
+                    <?php the_title(); ?>
+                </h1>
+            </header>
+
+            <div class="tuutor-content-blocks">
+                <?php foreach ($blocks as $block): ?>
+                    <div class="tuutor-block tuutor-block-<?php echo esc_attr($block['type']); ?>">
+                        <?php
+                        switch ($block['type']) {
+                            case 'text':
+                                echo wp_kses_post($block['content']);
+                                break;
+                            case 'image':
+                                $width = !empty($block['width']) ? $block['width'] : '100%';
+                                $align = !empty($block['align']) ? 'align' . $block['align'] : 'aligncenter';
+                                echo '<img src="' . esc_url($block['url']) . '" style="width:' . esc_attr($width) . ';" class="' . esc_attr($align) . '" alt="' . esc_attr($block['alt']) . '">';
+                                break;
+                            case 'accordion':
+                                $this->render_accordion($block['items']);
+                                break;
+                        }
+                        ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render Accordion Component
+     */
+    protected function render_accordion($items)
+    {
+        if (empty($items))
+            return;
+        ?>
+        <div class="tuutor-accordion-group">
+            <?php foreach ($items as $index => $item): ?>
+                <div class="tuutor-accordion-item">
+                    <button class="tuutor-accordion-trigger" aria-expanded="false">
+                        <?php echo esc_html($item['title']); ?>
+                        <span class="tuutor-accordion-icon"></span>
+                    </button>
+                    <div class="tuutor-accordion-content">
+                        <div class="tuutor-accordion-inner">
+                            <?php echo wp_kses_post($item['content']); ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * Enqueue frontend scripts and styles
+     */
+    public function enqueue_frontend_assets()
+    {
+        if (!is_singular('courses')) {
+            return;
+        }
+
+        wp_enqueue_style('tuutor-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        wp_enqueue_style('tuutor-display-css', TUUTOR_CUSTOM_URL . 'assets/css/display.css', array(), '1.0.0');
+        wp_enqueue_script('tuutor-display-js', TUUTOR_CUSTOM_URL . 'assets/js/display.js', array('jquery'), '1.0.0', true);
+    }
+}
