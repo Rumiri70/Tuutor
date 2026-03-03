@@ -7,7 +7,10 @@
             trainings: [],
             categories: [],
             currentTraining: null,
-            loading: true
+            loading: true,
+            currentPage: 1,
+            totalPages: 1,
+            perPage: 10
         },
 
         init: function () {
@@ -39,6 +42,7 @@
 
             this.$root.on('click', '.tuutor-remove-block', function (e) {
                 e.preventDefault();
+                self.syncState();
                 self.removeBlock($(this).closest('.tuutor-block-item').index());
             });
 
@@ -49,6 +53,7 @@
 
                 // Check if it's inside a grid column
                 const $col = $btn.closest('.tuutor-grid-col-editor');
+                self.syncState();
                 if ($col.length) {
                     const colIdx = $col.index();
                     self.openMediaLib(blockIdx, colIdx);
@@ -60,7 +65,14 @@
             this.$root.on('click', '.tuutor-add-accordion-item', function (e) {
                 e.preventDefault();
                 const blockIdx = $(this).closest('.tuutor-block-item').index();
+                self.syncState();
                 self.addAccordionItem(blockIdx);
+            });
+
+            this.$root.on('click', '.tuutor-page-link', function (e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                self.fetchInitialData(page);
             });
 
             this.$root.on('change', '.tuutor-grid-type-select', function () {
@@ -85,19 +97,22 @@
             });
         },
 
-        fetchInitialData: function () {
+        fetchInitialData: function (page = 1) {
             const self = this;
+            this.state.currentPage = page;
             this.renderLoading();
 
-            Promise.all([
-                this.apiGet('trainings'),
-                this.apiGet('categories')
-            ]).then(([trainings, categories]) => {
-                self.state.trainings = trainings;
-                self.state.categories = categories;
+            const trainingsPromise = this.apiGet('trainings', { page: page, per_page: this.state.perPage });
+            const categoriesPromise = this.state.categories.length ? Promise.resolve(this.state.categories) : this.apiGet('categories');
+
+            $.when(trainingsPromise, categoriesPromise).done((trainingsData, categoriesData) => {
+                // recordingsData is [data, statusText, jqXHR]
+                self.state.trainings = trainingsData[0];
+                self.state.totalPages = parseInt(trainingsData[2].getResponseHeader('X-WP-TotalPages')) || 1;
+                self.state.categories = categoriesData[0] || categoriesData;
                 self.state.loading = false;
                 self.render();
-            }).catch(err => {
+            }).fail(err => {
                 console.error('API Error:', err);
                 self.renderError();
             });
@@ -188,6 +203,18 @@
             }
 
             html += '</div></div>';
+
+            // Pagination UI
+            if (this.state.totalPages > 1) {
+                html += '<div class="tuutor-pagination" style="margin-top: 20px; display: flex; gap: 5px;">';
+                for (let i = 1; i <= this.state.totalPages; i++) {
+                    const isCurrent = i === this.state.currentPage;
+                    const activeStyle = isCurrent ? 'background: var(--tuutor-admin-primary); color: #fff;' : 'background: #fff;';
+                    html += `<button class="tuutor-btn tuutor-page-link" data-page="${i}" style="${activeStyle}">${i}</button>`;
+                }
+                html += '</div>';
+            }
+
             this.$root.html(html);
         },
 
@@ -321,6 +348,7 @@
 
         // Action Logic
         addBlock: function (type) {
+            this.syncState();
             const block = { type: type };
             if (type === 'accordion') block.items = [{ title: '', content: '' }];
             if (type === 'grid') block.columns = [{ type: 'text', content: '' }, { type: 'image', url: '', alt: '' }];
@@ -332,6 +360,7 @@
         },
 
         removeBlock: function (idx) {
+            // Already synced in event handler
             this.state.currentTraining.blocks.splice(idx, 1);
             this.render();
         },
@@ -445,6 +474,57 @@
             this.apiCall(`trainings/${id}`, 'DELETE')
                 .then(() => this.fetchInitialData())
                 .catch(err => console.error(err));
+        },
+
+        syncState: function () {
+            if (this.state.view === 'list') return;
+
+            const $form = $('#tuutor-training-form');
+            if (!$form.length) return;
+
+            this.state.currentTraining.title = $form.find('input[name="title"]').val();
+            this.state.currentTraining.categories = $form.find('input[name="categories[]"]:checked').map(function () { return parseInt($(this).val()); }).get();
+
+            const newBlocks = [];
+            $('.tuutor-block-item').each(function () {
+                const $block = $(this);
+                const type = $block.hasClass('tuutor-block-type-text') ? 'text' :
+                    ($block.hasClass('tuutor-block-type-image') ? 'image' :
+                        ($block.hasClass('tuutor-block-type-grid') ? 'grid' : 'accordion'));
+
+                const block = { type: type };
+
+                if (type === 'text') {
+                    block.content = $block.find('.tuutor-block-input').val();
+                } else if (type === 'image') {
+                    block.url = $block.find('.tuutor-block-input[data-field="url"]').val();
+                    block.width = $block.find('.tuutor-block-input[data-field="width"]').val();
+                    block.alt = $block.find('.tuutor-block-input[data-field="alt"]').val();
+                } else if (type === 'grid') {
+                    block.columns = [];
+                    $block.find('.tuutor-grid-col-editor').each(function () {
+                        const colType = $(this).find('.tuutor-grid-type-select').val();
+                        const col = { type: colType };
+                        if (colType === 'text') {
+                            col.content = $(this).find('.tuutor-grid-input[data-field="content"]').val();
+                        } else {
+                            col.url = $(this).find('.tuutor-grid-input[data-field="url"]').val();
+                            col.alt = $(this).find('.tuutor-grid-input[data-field="alt"]').val();
+                        }
+                        block.columns.push(col);
+                    });
+                } else if (type === 'accordion') {
+                    block.items = [];
+                    $block.find('.tuutor-accordion-editor-item').each(function () {
+                        block.items.push({
+                            title: $(this).find('.tuutor-acc-input[data-field="title"]').val(),
+                            content: $(this).find('.tuutor-acc-input[data-field="content"]').val()
+                        });
+                    });
+                }
+                newBlocks.push(block);
+            });
+            this.state.currentTraining.blocks = newBlocks;
         },
 
         // API Helpers

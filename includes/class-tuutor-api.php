@@ -80,10 +80,16 @@ class Tuutor_API
      */
     public function get_trainings($request)
     {
+        $per_page = $request->get_param('per_page') ? (int) $request->get_param('per_page') : 10;
+        $page = $request->get_param('page') ? (int) $request->get_param('page') : 1;
+
         $args = array(
             'post_type' => 'courses',
             'post_status' => 'any',
-            'posts_per_page' => -1,
+            'posts_per_page' => $per_page,
+            'paged' => $page,
+            'orderby' => 'ID',
+            'order' => 'DESC',
         );
 
         $query = new WP_Query($args);
@@ -97,7 +103,11 @@ class Tuutor_API
             wp_reset_postdata();
         }
 
-        return rest_ensure_response($trainings);
+        $response = rest_ensure_response($trainings);
+        $response->header('X-WP-Total', (int) $query->found_posts);
+        $response->header('X-WP-TotalPages', (int) $query->max_num_pages);
+
+        return $response;
     }
 
     /**
