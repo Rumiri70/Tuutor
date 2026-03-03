@@ -103,13 +103,30 @@
             this.renderLoading();
 
             const trainingsPromise = this.apiGet('trainings', { page: page, per_page: this.state.perPage });
-            const categoriesPromise = this.state.categories.length ? Promise.resolve(this.state.categories) : this.apiGet('categories');
 
-            $.when(trainingsPromise, categoriesPromise).done((trainingsData, categoriesData) => {
-                // recordingsData is [data, statusText, jqXHR]
-                self.state.trainings = trainingsData[0];
-                self.state.totalPages = parseInt(trainingsData[2].getResponseHeader('X-WP-TotalPages')) || 1;
-                self.state.categories = categoriesData[0] || categoriesData;
+            // Use jQuery Deferred for consistency with $.when
+            let categoriesPromise;
+            if (this.state.categories && this.state.categories.length) {
+                categoriesPromise = $.Deferred().resolve([this.state.categories]).promise();
+            } else {
+                categoriesPromise = this.apiGet('categories');
+            }
+
+            $.when(trainingsPromise, categoriesPromise).done((trainingsResult, categoriesResult) => {
+                // If AJAX, result is [data, status, xhr]. If our manual deferred, it's [data].
+                const trainingsData = trainingsResult[0] || trainingsResult;
+                const categoriesData = categoriesResult[0] || categoriesResult;
+
+                if (trainingsData.items) {
+                    self.state.trainings = trainingsData.items;
+                    self.state.totalPages = parseInt(trainingsData.totalPages) || 1;
+                } else {
+                    // Fallback if structure is old
+                    self.state.trainings = trainingsData;
+                    self.state.totalPages = 1;
+                }
+
+                self.state.categories = categoriesData;
                 self.state.loading = false;
                 self.render();
             }).fail(err => {
@@ -416,41 +433,9 @@
                 blocks: []
             };
 
-            // Scrap blocks from DOM to get current values
-            $('.tuutor-block-item').each(function (idx) {
-                const type = $(this).hasClass('tuutor-block-type-text') ? 'text' : ($(this).hasClass('tuutor-block-type-image') ? 'image' : 'accordion');
-                const block = { type: type };
-
-                if (type === 'text') {
-                    block.content = $(this).find('.tuutor-block-input').val();
-                } else if (type === 'image') {
-                    block.url = $(this).find('.tuutor-block-input[data-field="url"]').val();
-                    block.width = $(this).find('.tuutor-block-input[data-field="width"]').val();
-                    block.alt = $(this).find('.tuutor-block-input[data-field="alt"]').val();
-                } else if (type === 'grid') {
-                    block.columns = [];
-                    $(this).find('.tuutor-grid-col-editor').each(function () {
-                        const colType = $(this).find('.tuutor-grid-type-select').val();
-                        const col = { type: colType };
-                        if (colType === 'text') {
-                            col.content = $(this).find('.tuutor-grid-input[data-field="content"]').val();
-                        } else {
-                            col.url = $(this).find('.tuutor-grid-input[data-field="url"]').val();
-                            col.alt = $(this).find('.tuutor-grid-input[data-field="alt"]').val();
-                        }
-                        block.columns.push(col);
-                    });
-                } else if (type === 'accordion') {
-                    block.items = [];
-                    $(this).find('.tuutor-accordion-editor-item').each(function () {
-                        block.items.push({
-                            title: $(this).find('.tuutor-acc-input[data-field="title"]').val(),
-                            content: $(this).find('.tuutor-acc-input[data-field="content"]').val()
-                        });
-                    });
-                }
-                data.blocks.push(block);
-            });
+            // Scrap blocks from DOM to get current values (Always sync before saving)
+            this.syncState();
+            data.blocks = this.state.currentTraining.blocks;
 
             this.state.loading = true;
             this.renderLoading();
@@ -528,10 +513,11 @@
         },
 
         // API Helpers
-        apiGet: function (endpoint) {
+        apiGet: function (endpoint, data = {}) {
             return $.ajax({
                 url: tuutorSettings.apiUrl + '/' + endpoint,
                 method: 'GET',
+                data: data,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('X-WP-Nonce', tuutorSettings.nonce);
                 }

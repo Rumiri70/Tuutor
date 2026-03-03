@@ -192,6 +192,26 @@
     resize: vertical;
 }
 
+/* Pagination Styles */
+.tuutor-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--tuutor-admin-border);
+}
+
+.tuutor-page-link {
+    min-width: 35px;
+    justify-content: center;
+    box-shadow: var(--tuutor-admin-shadow);
+}
+
+.tuutor-page-link:hover {
+    background: #f0f0f1;
+    border-color: var(--tuutor-admin-primary);
+}
+
 /* Editor Styles */
 .tuutor-editor-container {
     background: #fff;

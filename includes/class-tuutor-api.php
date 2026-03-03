@@ -103,11 +103,13 @@ class Tuutor_API
             wp_reset_postdata();
         }
 
-        $response = rest_ensure_response($trainings);
-        $response->header('X-WP-Total', (int) $query->found_posts);
-        $response->header('X-WP-TotalPages', (int) $query->max_num_pages);
+        $data = array(
+            'items' => $trainings,
+            'total' => (int) $query->found_posts,
+            'totalPages' => (int) $query->max_num_pages,
+        );
 
-        return $response;
+        return rest_ensure_response($data);
     }
 
     /**
