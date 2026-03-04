@@ -39,6 +39,27 @@
     line-height: 1.2;
 }
 
+.tuutor-featured-image {
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: var(--tuutor-radius);
+    overflow: hidden;
+    box-shadow: var(--tuutor-shadow-lg);
+}
+
+.tuutor-featured-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    max-height: 450px;
+    transition: transform 0.5s ease;
+}
+
+.tuutor-featured-image:hover img {
+    transform: scale(1.02);
+}
+
 .tuutor-category-badges {
     display: flex;
     gap: 0.5rem;

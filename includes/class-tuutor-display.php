@@ -60,6 +60,11 @@ class Tuutor_Display
                     }
                     ?>
                 </div>
+                <?php if (has_post_thumbnail()): ?>
+                    <div class="tuutor-featured-image">
+                        <?php the_post_thumbnail('large'); ?>
+                    </div>
+                <?php endif; ?>
                 <h1>
                     <?php the_title(); ?>
                 </h1>

@@ -207,9 +207,16 @@
     box-shadow: var(--tuutor-admin-shadow);
 }
 
-.tuutor-page-link:hover {
+.tuutor-media-upload-featured {
     background: #f0f0f1;
-    border-color: var(--tuutor-admin-primary);
+    border: 1px solid #c3c4c7;
+    color: #2c3338;
+}
+
+.tuutor-media-upload-featured:hover {
+    background: #f6f7f7;
+    border-color: #8c8f94;
+    color: #2271b1;
 }
 
 /* Editor Styles */

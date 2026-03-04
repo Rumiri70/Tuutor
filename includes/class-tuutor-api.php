@@ -153,6 +153,11 @@ class Tuutor_API
             update_post_meta($post_id, '_tuutor_custom_blocks', json_encode($data['blocks']));
         }
 
+        // Handle featured image
+        if (!empty($data['featured_image_id'])) {
+            set_post_thumbnail($post_id, (int) $data['featured_image_id']);
+        }
+
         return rest_ensure_response($this->prepare_item_for_response(get_post($post_id)));
     }
 
@@ -178,6 +183,15 @@ class Tuutor_API
 
         if (isset($data['blocks'])) {
             update_post_meta($post_id, '_tuutor_custom_blocks', json_encode($data['blocks']));
+        }
+
+        // Handle featured image
+        if (isset($data['featured_image_id'])) {
+            if (empty($data['featured_image_id'])) {
+                delete_post_thumbnail($post_id);
+            } else {
+                set_post_thumbnail($post_id, (int) $data['featured_image_id']);
+            }
         }
 
         return rest_ensure_response($this->prepare_item_for_response(get_post($post_id)));
@@ -240,6 +254,10 @@ class Tuutor_API
             'categories' => wp_get_object_terms($post->ID, 'course-category', array('fields' => 'ids')),
             'blocks' => $blocks,
             'permalink' => get_permalink($post->ID),
+            'featured_image' => array(
+                'id' => get_post_thumbnail_id($post->ID),
+                'url' => get_the_post_thumbnail_url($post->ID, 'large'),
+            ),
         );
     }
 }

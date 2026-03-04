@@ -85,6 +85,18 @@
                 self.render();
             });
 
+            this.$root.on('click', '.tuutor-media-upload-featured', function (e) {
+                e.preventDefault();
+                self.syncState();
+                self.openMediaLib('featured');
+            });
+
+            this.$root.on('click', '.tuutor-remove-featured', function (e) {
+                e.preventDefault();
+                self.state.currentTraining.featured_image = { id: 0, url: '' };
+                self.render();
+            });
+
             this.$root.on('click', '.tuutor-page-link', function (e) {
                 e.preventDefault();
                 const page = $(this).data('page');
@@ -161,7 +173,7 @@
             switch (action) {
                 case 'create':
                     this.state.view = 'create';
-                    this.state.currentTraining = { title: '', content: '', categories: [], blocks: [] };
+                    this.state.currentTraining = { title: '', content: '', categories: [], blocks: [], featured_image: { id: 0, url: '' } };
                     this.render();
                     break;
                 case 'edit':
@@ -271,11 +283,21 @@
                             <input type="text" name="title" value="${t.title}" required>
                         </div>
                         <div class="tuutor-form-group">
+                            <label>Featured Image</label>
+                            <div class="tuutor-featured-image-preview-container">
+                                <img src="${t.featured_image ? t.featured_image.url : ''}" class="tuutor-featured-preview" style="${t.featured_image && t.featured_image.url ? '' : 'display:none;'} max-width: 200px; display: block; margin-bottom: 10px; border-radius: 8px;">
+                                <input type="hidden" name="featured_image_id" value="${t.featured_image ? t.featured_image.id : 0}">
+                                <button type="button" class="tuutor-btn tuutor-media-upload-featured">Select Featured Image</button>
+                                <button type="button" class="tuutor-btn tuutor-btn-danger tuutor-remove-featured" style="${t.featured_image && t.featured_image.id ? '' : 'display:none'}">Remove</button>
+                            </div>
+                        </div>
+
+                        <div class="tuutor-form-group">
                             <label>Categories</label>
                             <div class="tuutor-categories-checklist">
                                 ${this.state.categories.map(c => `
                                     <label style="display:inline-block; margin-right: 15px;">
-                                        <input type="checkbox" name="categories[]" value="${c.term_id}" ${t.categories.includes(c.term_id) ? 'checked' : ''}>
+                                        <input type="checkbox" name="categories[]" value="${c.term_id}" ${t.categories.includes(parseInt(c.term_id)) ? 'checked' : ''}>
                                         ${c.name}
                                     </label>
                                 `).join('')}
@@ -440,6 +462,16 @@
 
             frame.on('select', function () {
                 const attachment = frame.state().get('selection').first().toJSON();
+
+                if (blockIdx === 'featured') {
+                    self.state.currentTraining.featured_image = {
+                        id: attachment.id,
+                        url: attachment.url
+                    };
+                    self.render();
+                    return;
+                }
+
                 if (colIdx !== null) {
                     // Update grid column
                     const $block = $('.tuutor-block-item').eq(blockIdx);
@@ -469,6 +501,7 @@
             const $form = $('#tuutor-training-form');
             const data = {
                 title: $form.find('input[name="title"]').val(),
+                featured_image_id: $form.find('input[name="featured_image_id"]').val(),
                 categories: $form.find('input[name="categories[]"]:checked').map(function () { return $(this).val(); }).get(),
                 blocks: []
             };
