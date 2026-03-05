@@ -106,6 +106,8 @@ class Tuutor_Display
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <?php $this->render_navigation(); ?>
         </div>
         <?php
     }
@@ -148,5 +150,41 @@ class Tuutor_Display
         wp_enqueue_style('tuutor-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         wp_enqueue_style('tuutor-display-css', TUUTOR_CUSTOM_URL . 'assets/css/display.css', array(), '1.0.0');
         wp_enqueue_script('tuutor-display-js', TUUTOR_CUSTOM_URL . 'assets/js/display.js', array('jquery'), '1.0.0', true);
+    }
+
+    /**
+     * Render Next/Previous Training Navigation
+     */
+    protected function render_navigation()
+    {
+        $prev_post = get_previous_post();
+        $next_post = get_next_post();
+
+        if (!$prev_post && !$next_post) {
+            return;
+        }
+        ?>
+        <nav class="tuutor-navigation">
+            <div class="tuutor-nav-links">
+                <?php if ($prev_post): ?>
+                    <a href="<?php echo get_permalink($prev_post); ?>" class="tuutor-nav-link tuutor-nav-prev">
+                        <span class="tuutor-nav-label">Previous Training</span>
+                        <span class="tuutor-nav-title"><?php echo esc_html(get_the_title($prev_post)); ?></span>
+                    </a>
+                <?php else: ?>
+                    <div class="tuutor-nav-empty"></div>
+                <?php endif; ?>
+
+                <?php if ($next_post): ?>
+                    <a href="<?php echo get_permalink($next_post); ?>" class="tuutor-nav-link tuutor-nav-next">
+                        <span class="tuutor-nav-label">Next Training</span>
+                        <span class="tuutor-nav-title"><?php echo esc_html(get_the_title($next_post)); ?></span>
+                    </a>
+                <?php else: ?>
+                    <div class="tuutor-nav-empty"></div>
+                <?php endif; ?>
+            </div>
+        </nav>
+        <?php
     }
 }
