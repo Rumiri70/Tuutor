@@ -28,31 +28,13 @@ class Tuutor_Display
         $post_id = get_the_ID();
         $blocks_json = get_post_meta($post_id, '_tuutor_custom_blocks', true);
 
-        if (empty($blocks_json)) {
-            return $content; // Fallback to default if no custom blocks
-        }
-
-        $blocks = json_decode($blocks_json, true);
-        if (!is_array($blocks)) {
-            return $content;
-        }
-
         ob_start();
-        $this->render_custom_ui($blocks);
-        return ob_get_clean();
-    }
-
-    /**
-     * Render the custom UI based on blocks
-     */
-    protected function render_custom_ui($blocks)
-    {
         ?>
         <div class="tuutor-premium-display">
             <header class="tuutor-header">
                 <div class="tuutor-category-badges">
                     <?php
-                    $terms = get_the_terms(get_the_ID(), 'course-category');
+                    $terms = get_the_terms($post_id, 'course-category');
                     if ($terms && !is_wp_error($terms)) {
                         foreach ($terms as $term) {
                             echo '<span class="tuutor-badge">' . esc_html($term->name) . '</span>';
@@ -71,45 +53,65 @@ class Tuutor_Display
             </header>
 
             <div class="tuutor-content-blocks">
-                <?php foreach ($blocks as $block): ?>
-                    <div class="tuutor-block tuutor-block-<?php echo esc_attr($block['type']); ?>">
-                        <?php
-                        switch ($block['type']) {
-                            case 'text':
-                                echo wp_kses_post($block['content']);
-                                break;
-                            case 'image':
-                                $width = !empty($block['width']) ? $block['width'] : '100%';
-                                $align = !empty($block['align']) ? 'align' . $block['align'] : 'aligncenter';
-                                echo '<img src="' . esc_url($block['url']) . '" style="width:' . esc_attr($width) . ';" class="' . esc_attr($align) . '" alt="' . esc_attr($block['alt']) . '">';
-                                break;
-                            case 'accordion':
-                                $this->render_accordion($block['items']);
-                                break;
-                            case 'grid':
-                                echo '<div class="tuutor-grid-row">';
-                                foreach ($block['columns'] as $col) {
-                                    echo '<div class="tuutor-grid-col">';
-                                    if ($col['type'] === 'text') {
-                                        echo wp_kses_post($col['content']);
-                                    } else if ($col['type'] === 'image') {
-                                        echo '<img src="' . esc_url($col['url']) . '" alt="' . esc_attr($col['alt'] ?? '') . '">';
-                                    } else if ($col['type'] === 'accordion' && !empty($col['items'])) {
-                                        $this->render_accordion($col['items']);
-                                    }
-                                    echo '</div>';
-                                }
-                                echo '</div>';
-                                break;
-                        }
-                        ?>
-                    </div>
-                <?php endforeach; ?>
+                <?php
+                if (!empty($blocks_json)) {
+                    $blocks = json_decode($blocks_json, true);
+                    if (is_array($blocks)) {
+                        $this->render_blocks_ui($blocks);
+                    } else {
+                        echo $content;
+                    }
+                } else {
+                    echo $content;
+                }
+                ?>
             </div>
 
             <?php $this->render_navigation(); ?>
         </div>
         <?php
+        return ob_get_clean();
+    }
+
+    /**
+     * Render blocks only
+     */
+    protected function render_blocks_ui($blocks)
+    {
+        foreach ($blocks as $block): ?>
+            <div class="tuutor-block tuutor-block-<?php echo esc_attr($block['type']); ?>">
+                <?php
+                switch ($block['type']) {
+                    case 'text':
+                        echo wp_kses_post($block['content']);
+                        break;
+                    case 'image':
+                        $width = !empty($block['width']) ? $block['width'] : '100%';
+                        $align = !empty($block['align']) ? 'align' . $block['align'] : 'aligncenter';
+                        echo '<img src="' . esc_url($block['url']) . '" style="width:' . esc_attr($width) . ';" class="' . esc_attr($align) . '" alt="' . esc_attr($block['alt']) . '">';
+                        break;
+                    case 'accordion':
+                        $this->render_accordion($block['items']);
+                        break;
+                    case 'grid':
+                        echo '<div class="tuutor-grid-row">';
+                        foreach ($block['columns'] as $col) {
+                            echo '<div class="tuutor-grid-col">';
+                            if ($col['type'] === 'text') {
+                                echo wp_kses_post($col['content']);
+                            } else if ($col['type'] === 'image') {
+                                echo '<img src="' . esc_url($col['url']) . '" alt="' . esc_attr($col['alt'] ?? '') . '">';
+                            } else if ($col['type'] === 'accordion' && !empty($col['items'])) {
+                                $this->render_accordion($col['items']);
+                            }
+                            echo '</div>';
+                        }
+                        echo '</div>';
+                        break;
+                }
+                ?>
+            </div>
+        <?php endforeach;
     }
 
     /**

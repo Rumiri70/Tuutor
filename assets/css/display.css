@@ -240,6 +240,18 @@
     letter-spacing: 0.05em;
 }
 
+.tuutor-nav-label::before {
+    content: '← ';
+}
+
+.tuutor-nav-next .tuutor-nav-label::before {
+    content: '';
+}
+
+.tuutor-nav-next .tuutor-nav-label::after {
+    content: ' →';
+}
+
 .tuutor-nav-title {
     font-size: 1.1rem;
     font-weight: 700;
@@ -270,4 +282,36 @@
     .tuutor-header h1 {
         font-size: 1.75rem;
     }
+}
+
+/* Legacy Content Styling */
+.tuutor-content-blocks p {
+    margin-bottom: 1.5rem;
+    font-size: 1.125rem;
+    color: var(--tuutor-text);
+    line-height: 1.7;
+}
+
+.tuutor-content-blocks ul,
+.tuutor-content-blocks ol {
+    margin: 1.5rem 0 2rem 1.5rem;
+}
+
+.tuutor-content-blocks li {
+    margin-bottom: 0.85rem;
+    font-size: 1.05rem;
+    padding-left: 0.5rem;
+}
+
+.tuutor-content-blocks h2,
+.tuutor-content-blocks h3 {
+    color: var(--tuutor-primary);
+    margin: 2.5rem 0 1.25rem;
+    font-weight: 700;
+}
+
+.tuutor-content-blocks img {
+    margin: 2rem auto !important;
+    display: block;
+    max-width: 100%;
 }
