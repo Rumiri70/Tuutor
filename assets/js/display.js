@@ -73,16 +73,37 @@ document.addEventListener('DOMContentLoaded', function () {
 			paginationContainer.innerHTML = '';
 			if (maxPages <= 1) return;
 
-			for (let i = 1; i <= maxPages; i++) {
-				const btn = document.createElement('button');
-				btn.innerText = i;
-				btn.className = 'tuutor-page-link' + (i === currentPage ? ' active' : '');
-				btn.addEventListener('click', () => {
-					currentPage = i;
+			// Previous Button
+			const prevBtn = document.createElement('button');
+			prevBtn.innerText = '← Previous';
+			prevBtn.className = 'tuutor-page-link tuutor-page-prev';
+			if (currentPage === 1) prevBtn.disabled = true;
+			prevBtn.addEventListener('click', () => {
+				if (currentPage > 1) {
+					currentPage--;
 					fetchTrainings();
-				});
-				paginationContainer.appendChild(btn);
-			}
+				}
+			});
+			paginationContainer.appendChild(prevBtn);
+
+			// Current Page indicator
+			const currentBtn = document.createElement('button');
+			currentBtn.innerText = currentPage;
+			currentBtn.className = 'tuutor-page-link active';
+			paginationContainer.appendChild(currentBtn);
+
+			// Next Button
+			const nextBtn = document.createElement('button');
+			nextBtn.innerText = 'Next →';
+			nextBtn.className = 'tuutor-page-link tuutor-page-next';
+			if (currentPage === maxPages) nextBtn.disabled = true;
+			nextBtn.addEventListener('click', () => {
+				if (currentPage < maxPages) {
+					currentPage++;
+					fetchTrainings();
+				}
+			});
+			paginationContainer.appendChild(nextBtn);
 		};
 
 		// Event Listeners

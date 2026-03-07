@@ -188,6 +188,14 @@ class Tuutor_Display
                 <!-- Sidebar Filters -->
                 <aside class="tuutor-archive-sidebar" id="tuutor-sidebar">
                     <div class="tuutor-filter-group">
+                        <h3><?php _e('Search', 'tuutor'); ?></h3>
+                        <div class="tuutor-search-box">
+                            <input type="text" id="tuutor-search-input"
+                                placeholder="<?php _e('Search trainings...', 'tuutor'); ?>">
+                        </div>
+                    </div>
+
+                    <div class="tuutor-filter-group">
                         <h3><?php _e('Categories', 'tuutor'); ?></h3>
                         <ul class="tuutor-filter-list">
                             <li>
@@ -205,14 +213,6 @@ class Tuutor_Display
                                 </li>
                             <?php endforeach; ?>
                         </ul>
-                    </div>
-
-                    <div class="tuutor-filter-group">
-                        <h3><?php _e('Search', 'tuutor'); ?></h3>
-                        <div class="tuutor-search-box">
-                            <input type="text" id="tuutor-search-input"
-                                placeholder="<?php _e('Search trainings...', 'tuutor'); ?>">
-                        </div>
                     </div>
                 </aside>
 
