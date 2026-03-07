@@ -285,7 +285,6 @@ class Tuutor_API
                 $html .= '  <div class="tuutor-card-image"><img src="' . esc_url($thumb) . '" alt="' . esc_attr(get_the_title()) . '"></div>';
                 $html .= '  <div class="tuutor-card-body">';
                 $html .= '    <h4 class="tuutor-card-title"><a href="' . get_permalink() . '">' . get_the_title() . '</a></h4>';
-                $html .= '    <div class="tuutor-card-meta">' . wp_trim_words(get_the_excerpt(), 15) . '</div>';
                 $html .= '    <a href="' . get_permalink() . '" class="tuutor-card-btn">' . __('View Training', 'tuutor') . '</a>';
                 $html .= '  </div>';
                 $html .= '</article>';
