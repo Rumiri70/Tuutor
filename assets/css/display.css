@@ -293,6 +293,30 @@
     box-shadow: var(--tuutor-shadow);
     position: sticky;
     top: 2rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.tuutor-sidebar-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--tuutor-border);
+    margin-bottom: 1.5rem;
+}
+
+.tuutor-sidebar-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.tuutor-close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--tuutor-text-muted);
 }
 
 .tuutor-filter-group {
@@ -417,14 +441,6 @@
     color: var(--tuutor-text);
 }
 
-.tuutor-card-meta {
-    font-size: 0.85rem;
-    color: var(--tuutor-text-muted);
-    margin-bottom: 1.25rem;
-    flex-grow: 1;
-    line-height: 1.5;
-}
-
 .tuutor-card-btn {
     display: inline-block;
     background: var(--tuutor-bg);
@@ -467,6 +483,17 @@
     transition: all 0.2s;
 }
 
+.tuutor-page-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tuutor-page-link.active,
+.tuutor-page-link:hover:not(:disabled) {
+    background: var(--tuutor-primary);
+    color: #fff;
+}
+
 @media (max-width: 1024px) {
     .tuutor-archive-container {
         grid-template-columns: 220px 1fr;
@@ -480,7 +507,7 @@
     }
 
     .tuutor-archive-sidebar {
-        display: none;
+        display: block;
         position: fixed;
         top: 0;
         left: 0;
@@ -489,10 +516,19 @@
         z-index: 9999;
         border-radius: 0;
         overflow-y: auto;
+        transform: translateX(-100%);
+        opacity: 0;
+        pointer-events: none;
     }
 
     .tuutor-archive-sidebar.active {
-        display: block;
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .tuutor-sidebar-header {
+        display: flex;
     }
 
     .tuutor-mobile-filter-btn {
@@ -547,4 +583,3 @@
     display: block;
     max-width: 100%;
 }
-

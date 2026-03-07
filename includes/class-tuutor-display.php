@@ -187,6 +187,11 @@ class Tuutor_Display
             <div class="tuutor-archive-container">
                 <!-- Sidebar Filters -->
                 <aside class="tuutor-archive-sidebar" id="tuutor-sidebar">
+                    <div class="tuutor-sidebar-header">
+                        <h3><?php _e('Filters', 'tuutor'); ?></h3>
+                        <button id="tuutor-close-sidebar" class="tuutor-close-btn">&times;</button>
+                    </div>
+
                     <div class="tuutor-filter-group">
                         <h3><?php _e('Search', 'tuutor'); ?></h3>
                         <div class="tuutor-search-box">
