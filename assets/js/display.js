@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const catRadios = document.querySelectorAll('input[name="tuutor-cat"]');
 		const paginationContainer = document.getElementById('tuutor-pagination');
 		const filterToggle = document.getElementById('tuutor-filter-toggle');
-		const closeSidebar = document.getElementById('tuutor-close-sidebar');
 		const sidebar = document.getElementById('tuutor-sidebar');
 
 		let currentPage = 1;
@@ -65,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						renderPagination(response.data.max_pages);
 						archiveResults.style.opacity = '1';
 
-						// Only scroll if we are on mobile and results were tucked under sidebar
+						// Auto-close filter on mobile after selection
 						if (window.innerWidth <= 900 && sidebar.classList.contains('active')) {
 							sidebar.classList.remove('active');
 						}
@@ -133,12 +132,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (filterToggle) {
 			filterToggle.addEventListener('click', () => {
 				sidebar.classList.toggle('active');
-			});
-		}
-
-		if (closeSidebar) {
-			closeSidebar.addEventListener('click', () => {
-				sidebar.classList.remove('active');
 			});
 		}
 

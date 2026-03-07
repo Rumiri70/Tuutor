@@ -274,7 +274,6 @@
     max-width: 1240px;
     margin: 2rem auto;
     padding: 0 1.5rem;
-    overflow: hidden;
 }
 
 .tuutor-archive-container {
@@ -293,7 +292,8 @@
     box-shadow: var(--tuutor-shadow);
     position: sticky;
     top: 2rem;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease, max-height 0.4s ease;
+    z-index: 10;
 }
 
 .tuutor-sidebar-header {
@@ -504,31 +504,38 @@
 @media (max-width: 900px) {
     .tuutor-archive-container {
         grid-template-columns: 1fr;
+        gap: 0;
     }
 
     .tuutor-archive-sidebar {
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9999;
-        border-radius: 0;
-        overflow-y: auto;
-        transform: translateX(-100%);
+        position: relative !important;
+        top: 0 !important;
+        display: block !important;
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 1.5rem !important;
+        border: none !important;
+        box-shadow: none !important;
         opacity: 0;
         pointer-events: none;
+        transform: none !important;
+        transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease;
     }
 
     .tuutor-archive-sidebar.active {
-        transform: translateX(0);
+        max-height: 1000px;
+        /* Allow expansion */
         opacity: 1;
         pointer-events: auto;
+        padding: 1.5rem !important;
+        margin-bottom: 2rem;
+        border: 1px solid var(--tuutor-border) !important;
+        box-shadow: var(--tuutor-shadow) !important;
     }
 
     .tuutor-sidebar-header {
-        display: flex;
+        display: none !important;
+        /* Header not needed for expand down */
     }
 
     .tuutor-mobile-filter-btn {
