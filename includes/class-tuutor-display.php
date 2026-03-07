@@ -14,6 +14,7 @@ class Tuutor_Display
     {
         add_filter('the_content', array($this, 'filter_course_content'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+        add_shortcode('tuutor_trainings', array($this, 'render_trainings_archive'));
     }
 
     /**
@@ -145,13 +146,94 @@ class Tuutor_Display
      */
     public function enqueue_frontend_assets()
     {
-        if (!is_singular('courses')) {
+        if (!is_singular('courses') && !has_shortcode(get_post()->post_content ?? '', 'tuutor_trainings')) {
             return;
         }
 
         wp_enqueue_style('tuutor-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        wp_enqueue_style('tuutor-display-css', TUUTOR_CUSTOM_URL . 'assets/css/display.css', array(), '1.0.0');
-        wp_enqueue_script('tuutor-display-js', TUUTOR_CUSTOM_URL . 'assets/js/display.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_style('tuutor-display-css', TUUTOR_CUSTOM_URL . 'assets/css/display.css', array(), '1.1.0');
+        wp_enqueue_script('tuutor-display-js', TUUTOR_CUSTOM_URL . 'assets/js/display.js', array('jquery'), '1.1.0', true);
+
+        // Localize for AJAX filtering
+        wp_localize_script('tuutor-display-js', 'tuutorData', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('tuutor_archive_nonce'),
+        ));
+    }
+
+    /**
+     * Render Responsive Trainings Archive via Shortcode
+     */
+    public function render_trainings_archive($atts)
+    {
+        $atts = shortcode_atts(array(
+            'per_page' => 12,
+        ), $atts);
+
+        $categories = get_terms(array(
+            'taxonomy' => 'course-category',
+            'hide_empty' => true,
+        ));
+
+        ob_start();
+        ?>
+        <div class="tuutor-archive-wrapper">
+            <!-- Mobile Filter Toggle -->
+            <button class="tuutor-mobile-filter-btn" id="tuutor-filter-toggle">
+                <span class="dashicons dashicons-filter"></span>
+                <?php _e('Filters', 'tuutor'); ?>
+            </button>
+
+            <div class="tuutor-archive-container">
+                <!-- Sidebar Filters -->
+                <aside class="tuutor-archive-sidebar" id="tuutor-sidebar">
+                    <div class="tuutor-filter-group">
+                        <h3><?php _e('Categories', 'tuutor'); ?></h3>
+                        <ul class="tuutor-filter-list">
+                            <li>
+                                <label>
+                                    <input type="radio" name="tuutor-cat" value="all" checked>
+                                    <span><?php _e('All Trainings', 'tuutor'); ?></span>
+                                </label>
+                            </li>
+                            <?php foreach ($categories as $cat): ?>
+                                <li>
+                                    <label>
+                                        <input type="radio" name="tuutor-cat" value="<?php echo esc_attr($cat->term_id); ?>">
+                                        <span><?php echo esc_html($cat->name); ?></span>
+                                    </label>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+
+                    <div class="tuutor-filter-group">
+                        <h3><?php _e('Search', 'tuutor'); ?></h3>
+                        <div class="tuutor-search-box">
+                            <input type="text" id="tuutor-search-input"
+                                placeholder="<?php _e('Search trainings...', 'tuutor'); ?>">
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Results Area -->
+                <main class="tuutor-archive-main">
+                    <div id="tuutor-archive-results" class="tuutor-training-grid"
+                        data-per-page="<?php echo esc_attr($atts['per_page']); ?>">
+                        <!-- Trainings will be loaded here via AJAX -->
+                        <div class="tuutor-loading-placeholder">
+                            <span class="spinner is-active"></span>
+                        </div>
+                    </div>
+
+                    <div id="tuutor-pagination" class="tuutor-pagination">
+                        <!-- Pagination will be rendered here -->
+                    </div>
+                </main>
+            </div>
+        </div>
+        <?php
+        return ob_get_clean();
     }
 
     /**

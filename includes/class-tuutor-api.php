@@ -15,6 +15,10 @@ class Tuutor_API
     public function __construct()
     {
         add_action('rest_api_init', array($this, 'register_routes'));
+
+        // AJAX handlers for archive filtering
+        add_action('wp_ajax_tuutor_fetch_archive', array($this, 'ajax_fetch_trainings'));
+        add_action('wp_ajax_nopriv_tuutor_fetch_archive', array($this, 'ajax_fetch_trainings'));
     }
 
     /**
@@ -236,6 +240,68 @@ class Tuutor_API
             return $term;
         }
         return rest_ensure_response(get_term($term['term_id'], 'course-category'));
+    }
+
+    /**
+     * AJAX Fetch Trainings for Archive
+     */
+    public function ajax_fetch_trainings()
+    {
+        check_ajax_referer('tuutor_archive_nonce', 'nonce');
+
+        $paged = isset($_POST['page']) ? intval($_POST['page']) : 1;
+        $cat = isset($_POST['category']) && $_POST['category'] !== 'all' ? intval($_POST['category']) : '';
+        $search = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+        $per_page = isset($_POST['per_page']) ? intval($_POST['per_page']) : 12;
+
+        $args = array(
+            'post_type' => 'courses',
+            'posts_per_page' => $per_page,
+            'paged' => $paged,
+            'post_status' => 'publish',
+            's' => $search,
+        );
+
+        if ($cat) {
+            $args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'course-category',
+                    'field' => 'term_id',
+                    'terms' => $cat,
+                ),
+            );
+        }
+
+        $query = new WP_Query($args);
+        $html = '';
+
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $post_id = get_the_ID();
+                $thumb = get_the_post_thumbnail_url($post_id, 'medium_large') ?: TUUTOR_CUSTOM_URL . 'assets/images/placeholder.jpg';
+
+                $html .= '<article class="tuutor-card">';
+                $html .= '  <div class="tuutor-card-image"><img src="' . esc_url($thumb) . '" alt="' . esc_attr(get_the_title()) . '"></div>';
+                $html .= '  <div class="tuutor-card-body">';
+                $html .= '    <h4 class="tuutor-card-title"><a href="' . get_permalink() . '">' . get_the_title() . '</a></h4>';
+                $html .= '    <div class="tuutor-card-meta">' . wp_trim_words(get_the_excerpt(), 15) . '</div>';
+                $html .= '    <a href="' . get_permalink() . '" class="tuutor-card-btn">' . __('View Training', 'tuutor') . '</a>';
+                $html .= '  </div>';
+                $html .= '</article>';
+            }
+        } else {
+            $html = '<div class="tuutor-no-results">' . __('No trainings found matching your criteria.', 'tuutor') . '</div>';
+        }
+
+        $data = array(
+            'html' => $html,
+            'max_pages' => $query->max_num_pages,
+            'found_posts' => $query->found_posts,
+            'current_page' => $paged
+        );
+
+        wp_send_json_success($data);
     }
 
     /**

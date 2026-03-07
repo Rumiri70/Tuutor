@@ -1,50 +1,114 @@
-document.addEventListener('DOMContentLoaded', function() {
-	// Accordion logic
+document.addEventListener('DOMContentLoaded', function () {
+	// Single Course: Accordion logic
 	const triggers = document.querySelectorAll('.tuutor-accordion-trigger');
-	
 	triggers.forEach(trigger => {
-		trigger.addEventListener('click', function() {
+		trigger.addEventListener('click', function () {
 			const isExpanded = this.getAttribute('aria-expanded') === 'true';
 			const content = this.nextElementSibling;
-			
-			// Close all other accordions in the same group (optional, let's keep it simple)
 			const parentGroup = this.closest('.tuutor-accordion-group');
 			const siblingItems = parentGroup.querySelectorAll('.tuutor-accordion-item');
-			
+
 			siblingItems.forEach(item => {
 				const itTrigger = item.querySelector('.tuutor-accordion-trigger');
 				const itContent = item.querySelector('.tuutor-accordion-content');
-				
 				if (itTrigger !== trigger) {
 					itTrigger.setAttribute('aria-expanded', 'false');
 					itContent.style.maxHeight = null;
 				}
 			});
 
-			// Toggle the current accordion
 			this.setAttribute('aria-expanded', !isExpanded);
-			
 			if (!isExpanded) {
 				content.style.maxHeight = content.scrollHeight + 'px';
-				// Smoothly ensure it's visible if it's large
-				setTimeout(() => {
-					content.style.maxHeight = 'none'; // Allow content to overflow if needed after animation
-				}, 400);
+				setTimeout(() => { if (this.getAttribute('aria-expanded') === 'true') content.style.maxHeight = 'none'; }, 400);
 			} else {
-				// We need to set max-height to a pixel value before setting it to null for the transition to work
 				content.style.maxHeight = content.scrollHeight + 'px';
-				// Trigger reflow
-				content.offsetHeight;
+				content.offsetHeight; // force reflow
 				content.style.maxHeight = null;
 			}
 		});
 	});
 
-	// Handle resizable images (if not handled by CSS alone)
-	const resizableImages = document.querySelectorAll('.tuutor-block-image img');
-	resizableImages.forEach(img => {
-		img.addEventListener('load', function() {
-			this.style.opacity = '1';
+	// --- Archive Logic ---
+	const archiveResults = document.getElementById('tuutor-archive-results');
+	if (archiveResults) {
+		const searchInput = document.getElementById('tuutor-search-input');
+		const catRadios = document.querySelectorAll('input[name="tuutor-cat"]');
+		const paginationContainer = document.getElementById('tuutor-pagination');
+		const filterToggle = document.getElementById('tuutor-filter-toggle');
+		const sidebar = document.getElementById('tuutor-sidebar');
+
+		let currentPage = 1;
+
+		const fetchTrainings = () => {
+			archiveResults.style.opacity = '0.5';
+
+			const category = document.querySelector('input[name="tuutor-cat"]:checked').value;
+			const search = searchInput.value;
+			const perPage = archiveResults.dataset.perPage;
+
+			jQuery.ajax({
+				url: tuutorData.ajaxUrl,
+				type: 'POST',
+				data: {
+					action: 'tuutor_fetch_archive',
+					nonce: tuutorData.nonce,
+					category: category,
+					search: search,
+					page: currentPage,
+					per_page: perPage
+				},
+				success: function (response) {
+					if (response.success) {
+						archiveResults.innerHTML = response.data.html;
+						renderPagination(response.data.max_pages);
+						archiveResults.style.opacity = '1';
+						window.scrollTo({ top: archiveResults.offsetTop - 100, behavior: 'smooth' });
+					}
+				}
+			});
+		};
+
+		const renderPagination = (maxPages) => {
+			paginationContainer.innerHTML = '';
+			if (maxPages <= 1) return;
+
+			for (let i = 1; i <= maxPages; i++) {
+				const btn = document.createElement('button');
+				btn.innerText = i;
+				btn.className = 'tuutor-page-link' + (i === currentPage ? ' active' : '');
+				btn.addEventListener('click', () => {
+					currentPage = i;
+					fetchTrainings();
+				});
+				paginationContainer.appendChild(btn);
+			}
+		};
+
+		// Event Listeners
+		let searchTimeout;
+		searchInput.addEventListener('input', () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				currentPage = 1;
+				fetchTrainings();
+			}, 500);
 		});
-	});
+
+		catRadios.forEach(radio => {
+			radio.addEventListener('change', () => {
+				currentPage = 1;
+				fetchTrainings();
+			});
+		});
+
+		if (filterToggle) {
+			filterToggle.addEventListener('click', () => {
+				sidebar.classList.toggle('active');
+			});
+		}
+
+		// Initial load
+		fetchTrainings();
+	}
 });
