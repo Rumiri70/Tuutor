@@ -113,14 +113,22 @@
                 if (type === 'text') {
                     $col.find('.tuutor-grid-col-text-area').show();
                     $col.find('.tuutor-grid-col-image-area').hide();
+                    $col.find('.tuutor-grid-col-youtube-area').hide();
                     $col.find('.tuutor-grid-col-accordion-area').hide();
                 } else if (type === 'image') {
                     $col.find('.tuutor-grid-col-text-area').hide();
                     $col.find('.tuutor-grid-col-image-area').show();
+                    $col.find('.tuutor-grid-col-youtube-area').hide();
+                    $col.find('.tuutor-grid-col-accordion-area').hide();
+                } else if (type === 'youtube') {
+                    $col.find('.tuutor-grid-col-text-area').hide();
+                    $col.find('.tuutor-grid-col-image-area').hide();
+                    $col.find('.tuutor-grid-col-youtube-area').show();
                     $col.find('.tuutor-grid-col-accordion-area').hide();
                 } else {
                     $col.find('.tuutor-grid-col-text-area').hide();
                     $col.find('.tuutor-grid-col-image-area').hide();
+                    $col.find('.tuutor-grid-col-youtube-area').hide();
                     $col.find('.tuutor-grid-col-accordion-area').show();
                 }
             });
@@ -314,6 +322,7 @@
                                 <span>Add Block:</span>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="text">+ Text</button>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="image">+ Image</button>
+                                <button type="button" class="tuutor-btn tuutor-add-block" data-type="youtube">+ YouTube</button>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="grid">+ Grid (2 Col)</button>
                                 <button type="button" class="tuutor-btn tuutor-add-block" data-type="accordion">+ Accordion</button>
                                 <div class="tuutor-save-controls" style="margin-left: auto;">
@@ -354,6 +363,13 @@
                             </div>
                         </div>
                     `;
+                } else if (b.type === 'youtube') {
+                    blockHtml += `
+                        <div class="tuutor-youtube-editor" style="padding:10px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
+                            <label>YouTube Video URL:</label>
+                            <input type="text" class="tuutor-block-input" data-field="url" value="${b.url || ''}" placeholder="https://www.youtube.com/watch?v=..." style="width:100%;">
+                        </div>
+                    `;
                 } else if (b.type === 'grid') {
                     blockHtml += `
                         <div class="tuutor-grid-editor">
@@ -365,6 +381,7 @@
                                             <select class="tuutor-grid-type-select">
                                                 <option value="text" ${col.type === 'text' ? 'selected' : ''}>Text</option>
                                                 <option value="image" ${col.type === 'image' ? 'selected' : ''}>Image</option>
+                                                <option value="youtube" ${col.type === 'youtube' ? 'selected' : ''}>YouTube</option>
                                                 <option value="accordion" ${col.type === 'accordion' ? 'selected' : ''}>Accordion</option>
                                             </select>
                                         </div>
@@ -380,6 +397,11 @@
                                             <div style="margin-top:5px;">
                                                 <input type="text" class="tuutor-grid-input" data-field="alt" placeholder="Alt text" value="${col.alt || ''}">
                                             </div>
+                                        </div>
+
+                                        <div class="tuutor-grid-col-youtube-area" style="${col.type === 'youtube' ? '' : 'display:none'}">
+                                            <label>YouTube URL:</label>
+                                            <input type="text" class="tuutor-grid-input" data-field="url" placeholder="https://www.youtube.com/watch?v=..." value="${col.url || ''}" style="width:100%;">
                                         </div>
 
                                         <div class="tuutor-grid-col-accordion-area" style="${col.type === 'accordion' ? '' : 'display:none'}">
@@ -428,6 +450,7 @@
             if (type === 'accordion') block.items = [{ title: '', content: '' }];
             if (type === 'grid') block.columns = [{ type: 'text', content: '' }, { type: 'image', url: '', alt: '' }];
             if (type === 'image') { block.url = ''; block.width = '100%'; block.alt = ''; }
+            if (type === 'youtube') block.url = '';
             if (type === 'text') block.content = '';
 
             this.state.currentTraining.blocks.push(block);
@@ -548,7 +571,8 @@
                 const $block = $(this);
                 const type = $block.hasClass('tuutor-block-type-text') ? 'text' :
                     ($block.hasClass('tuutor-block-type-image') ? 'image' :
-                        ($block.hasClass('tuutor-block-type-grid') ? 'grid' : 'accordion'));
+                        ($block.hasClass('tuutor-block-type-youtube') ? 'youtube' :
+                            ($block.hasClass('tuutor-block-type-grid') ? 'grid' : 'accordion')));
 
                 const block = { type: type };
 
@@ -558,6 +582,8 @@
                     block.url = $block.find('.tuutor-block-input[data-field="url"]').val();
                     block.width = $block.find('.tuutor-block-input[data-field="width"]').val();
                     block.alt = $block.find('.tuutor-block-input[data-field="alt"]').val();
+                } else if (type === 'youtube') {
+                    block.url = $block.find('.tuutor-block-input[data-field="url"]').val();
                 } else if (type === 'grid') {
                     block.columns = [];
                     $block.find('.tuutor-grid-col-editor').each(function () {
@@ -568,6 +594,8 @@
                         } else if (colType === 'image') {
                             col.url = $(this).find('.tuutor-grid-input[data-field="url"]').val();
                             col.alt = $(this).find('.tuutor-grid-input[data-field="alt"]').val();
+                        } else if (colType === 'youtube') {
+                            col.url = $(this).find('.tuutor-grid-input[data-field="url"]').val();
                         } else {
                             col.items = [];
                             $(this).find('.tuutor-accordion-editor-item').each(function () {

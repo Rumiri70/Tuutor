@@ -91,6 +91,14 @@ class Tuutor_Display
                         $align = !empty($block['align']) ? 'align' . $block['align'] : 'aligncenter';
                         echo '<img src="' . esc_url($block['url']) . '" style="width:' . esc_attr($width) . ';" class="' . esc_attr($align) . '" alt="' . esc_attr($block['alt']) . '">';
                         break;
+                    case 'youtube':
+                        $url = esc_url($block['url'] ?? '');
+                        preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $url, $match);
+                        $youtube_id = isset($match[1]) ? $match[1] : '';
+                        if ($youtube_id) {
+                            echo '<div class="tuutor-youtube-embed"><iframe width="100%" height="400" src="https://www.youtube.com/embed/' . esc_attr($youtube_id) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+                        }
+                        break;
                     case 'accordion':
                         $this->render_accordion($block['items']);
                         break;
@@ -102,6 +110,13 @@ class Tuutor_Display
                                 echo wp_kses_post($col['content']);
                             } else if ($col['type'] === 'image') {
                                 echo '<img src="' . esc_url($col['url']) . '" alt="' . esc_attr($col['alt'] ?? '') . '">';
+                            } else if ($col['type'] === 'youtube') {
+                                $url = esc_url($col['url'] ?? '');
+                                preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $url, $match);
+                                $youtube_id = isset($match[1]) ? $match[1] : '';
+                                if ($youtube_id) {
+                                    echo '<div class="tuutor-youtube-embed"><iframe width="100%" height="300" src="https://www.youtube.com/embed/' . esc_attr($youtube_id) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+                                }
                             } else if ($col['type'] === 'accordion' && !empty($col['items'])) {
                                 $this->render_accordion($col['items']);
                             }

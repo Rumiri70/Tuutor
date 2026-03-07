@@ -24,6 +24,7 @@ class Tuutor_Blocks
             'text' => __('Text Editor', 'tuutor'),
             'image' => __('Resizable Image', 'tuutor'),
             'accordion' => __('Accordion Group', 'tuutor'),
+            'youtube' => __('YouTube Video', 'tuutor'),
             'grid' => __('Grid (2 Columns)', 'tuutor'),
         );
     }
