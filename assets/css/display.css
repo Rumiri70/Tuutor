@@ -12,7 +12,7 @@
     --tuutor-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-* {
+.tuutor-archive-wrapper * {
     box-sizing: border-box;
 }
 
@@ -267,19 +267,22 @@
     text-align: right;
 }
 
-/* Archive Styles */
+/* Archive Styles - Improved Responsiveness */
 .tuutor-archive-wrapper {
     font-family: var(--tuutor-font);
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1240px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0 1.5rem;
+    overflow: hidden;
 }
 
 .tuutor-archive-container {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 2rem;
     align-items: start;
+    width: 100%;
 }
 
 .tuutor-archive-sidebar {
@@ -301,7 +304,7 @@
 }
 
 .tuutor-filter-group h3 {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 1rem;
     color: var(--tuutor-text);
@@ -310,13 +313,14 @@
 }
 
 .tuutor-filter-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .tuutor-filter-list li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem !important;
+    padding: 0 !important;
 }
 
 .tuutor-filter-list label {
@@ -324,7 +328,7 @@
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--tuutor-text-muted);
     transition: color 0.2s;
 }
@@ -334,18 +338,19 @@
 }
 
 .tuutor-filter-list input[type="radio"] {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1.1rem;
+    height: 1.1rem;
     accent-color: var(--tuutor-primary);
+    margin: 0;
 }
 
 .tuutor-search-box input {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 0.7rem 1rem;
     border: 1px solid var(--tuutor-border);
     border-radius: 8px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .tuutor-search-box input:focus {
@@ -354,11 +359,11 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* SMALLER CARDS + 3 COLUMN GRID */
 .tuutor-training-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1.5rem;
+    width: 100%;
 }
 
 .tuutor-card {
@@ -369,6 +374,7 @@
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .tuutor-card:hover {
@@ -384,14 +390,12 @@
 }
 
 .tuutor-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
     transition: transform 0.5s ease;
-}
-
-.tuutor-card:hover .tuutor-card-image img {
-    transform: scale(1.05);
+    display: block;
+    margin: 0 !important;
 }
 
 .tuutor-card-body {
@@ -402,7 +406,7 @@
 }
 
 .tuutor-card-title {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     margin: 0 0 0.5rem 0;
     line-height: 1.4;
@@ -411,11 +415,6 @@
 .tuutor-card-title a {
     text-decoration: none;
     color: var(--tuutor-text);
-    transition: color 0.2s;
-}
-
-.tuutor-card-title a:hover {
-    color: var(--tuutor-primary);
 }
 
 .tuutor-card-meta {
@@ -431,11 +430,11 @@
     background: var(--tuutor-bg);
     color: var(--tuutor-primary);
     text-align: center;
-    padding: 0.6rem;
+    padding: 0.65rem;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.2s;
     border: 1px solid var(--tuutor-border);
 }
@@ -443,7 +442,6 @@
 .tuutor-card-btn:hover {
     background: var(--tuutor-primary);
     color: #fff;
-    border-color: var(--tuutor-primary);
 }
 
 .tuutor-pagination {
@@ -465,41 +463,15 @@
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 0.9rem;
     transition: all 0.2s;
 }
 
-.tuutor-page-link:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.tuutor-page-link:hover:not(:disabled),
-.tuutor-page-link.active {
-    background: var(--tuutor-primary);
-    color: #fff;
-    border-color: var(--tuutor-primary);
-}
-
-.tuutor-mobile-filter-btn {
-    display: none;
-    width: 100%;
-    padding: 1rem;
-    background: var(--tuutor-primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--tuutor-radius);
-    font-weight: 700;
-    margin-bottom: 1rem;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.tuutor-loading-placeholder {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 4rem;
+@media (max-width: 1024px) {
+    .tuutor-archive-container {
+        grid-template-columns: 220px 1fr;
+        gap: 1.5rem;
+    }
 }
 
 @media (max-width: 900px) {
@@ -514,7 +486,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 1000;
+        z-index: 9999;
         border-radius: 0;
         overflow-y: auto;
     }
@@ -524,14 +496,24 @@
     }
 
     .tuutor-mobile-filter-btn {
-        display: flex;
+        display: flex !important;
     }
 }
 
-@media (max-width: 600px) {
-    .tuutor-training-grid {
-        grid-template-columns: 1fr;
-    }
+.tuutor-mobile-filter-btn {
+    display: none;
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--tuutor-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
 }
 
 /* Legacy Content Styling */
