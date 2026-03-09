@@ -92,7 +92,7 @@ class Tuutor_API
             'post_status' => 'any',
             'posts_per_page' => $per_page,
             'paged' => $page,
-            'orderby' => 'ID',
+            'orderby' => 'modified',
             'order' => 'DESC',
         );
 
@@ -260,6 +260,8 @@ class Tuutor_API
             'paged' => $paged,
             'post_status' => 'publish',
             's' => $search,
+            'orderby' => 'modified',
+            'order' => 'DESC',
         );
 
         if ($cat) {
