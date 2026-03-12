@@ -54,13 +54,6 @@ class Tuutor_Display
                         <?php the_post_thumbnail('large'); ?>
                     </div>
                 <?php endif; ?>
-                
-                <?php 
-                $featured_video = do_shortcode('[tuutor_featured_video]');
-                if (!empty($featured_video)) {
-                    echo $featured_video;
-                }
-                ?>
 
                 <h1>
                     <?php the_title(); ?>
