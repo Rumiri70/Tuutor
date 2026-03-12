@@ -162,6 +162,11 @@ class Tuutor_API
             set_post_thumbnail($post_id, (int) $data['featured_image_id']);
         }
 
+        // Handle featured video
+        if (isset($data['featured_video'])) {
+            update_post_meta($post_id, '_tuutor_featured_video', esc_url_raw($data['featured_video']));
+        }
+
         return rest_ensure_response($this->prepare_item_for_response(get_post($post_id)));
     }
 
@@ -196,6 +201,11 @@ class Tuutor_API
             } else {
                 set_post_thumbnail($post_id, (int) $data['featured_image_id']);
             }
+        }
+
+        // Handle featured video
+        if (isset($data['featured_video'])) {
+            update_post_meta($post_id, '_tuutor_featured_video', esc_url_raw($data['featured_video']));
         }
 
         return rest_ensure_response($this->prepare_item_for_response(get_post($post_id)));
@@ -325,6 +335,7 @@ class Tuutor_API
                 'id' => get_post_thumbnail_id($post->ID),
                 'url' => get_the_post_thumbnail_url($post->ID, 'large'),
             ),
+            'featured_video' => get_post_meta($post->ID, '_tuutor_featured_video', true) ?: '',
         );
     }
 }

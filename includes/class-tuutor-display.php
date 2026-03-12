@@ -15,6 +15,7 @@ class Tuutor_Display
         add_filter('the_content', array($this, 'filter_course_content'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_shortcode('tuutor_trainings', array($this, 'render_trainings_archive'));
+        add_shortcode('tuutor_featured_video', array($this, 'render_featured_video_shortcode'));
     }
 
     /**
@@ -290,5 +291,30 @@ class Tuutor_Display
             </div>
         </nav>
         <?php
+    }
+
+    /**
+     * Render Featured Video Shortcode
+     */
+    public function render_featured_video_shortcode($atts)
+    {
+        $post_id = get_the_ID();
+        if (!$post_id) {
+            return '';
+        }
+
+        $video_url = get_post_meta($post_id, '_tuutor_featured_video', true);
+        if (empty($video_url)) {
+            return '';
+        }
+
+        preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $video_url, $match);
+        $youtube_id = isset($match[1]) ? $match[1] : '';
+
+        if ($youtube_id) {
+            return '<div class="tuutor-youtube-embed"><iframe width="100%" height="400" src="https://www.youtube.com/embed/' . esc_attr($youtube_id) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+        }
+
+        return '';
     }
 }

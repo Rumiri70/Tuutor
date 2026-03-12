@@ -181,7 +181,7 @@
             switch (action) {
                 case 'create':
                     this.state.view = 'create';
-                    this.state.currentTraining = { title: '', content: '', categories: [], blocks: [], featured_image: { id: 0, url: '' } };
+                    this.state.currentTraining = { title: '', content: '', categories: [], blocks: [], featured_image: { id: 0, url: '' }, featured_video: '' };
                     this.render();
                     break;
                 case 'edit':
@@ -298,6 +298,11 @@
                                 <button type="button" class="tuutor-btn tuutor-media-upload-featured">Select Featured Image</button>
                                 <button type="button" class="tuutor-btn tuutor-btn-danger tuutor-remove-featured" style="${t.featured_image && t.featured_image.id ? '' : 'display:none'}">Remove</button>
                             </div>
+                        </div>
+
+                        <div class="tuutor-form-group">
+                            <label>Featured YouTube Video URL</label>
+                            <input type="text" name="featured_video" value="${t.featured_video || ''}" placeholder="https://www.youtube.com/watch?v=...">
                         </div>
 
                         <div class="tuutor-form-group">
@@ -525,6 +530,7 @@
             const data = {
                 title: $form.find('input[name="title"]').val(),
                 featured_image_id: $form.find('input[name="featured_image_id"]').val(),
+                featured_video: $form.find('input[name="featured_video"]').val(),
                 categories: $form.find('input[name="categories[]"]:checked').map(function () { return $(this).val(); }).get(),
                 blocks: []
             };
