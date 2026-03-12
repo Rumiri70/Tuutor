@@ -14,11 +14,8 @@ class Tuutor_Display
     {
         add_filter('the_content', array($this, 'filter_course_content'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
+        add_shortcode('tuutor_trainings', array($this, 'render_trainings_archive'));
         add_shortcode('tuutor_featured_video', array($this, 'render_featured_video_shortcode'));
-
-        // Enable shortcodes in text widgets and term descriptions
-        add_filter('widget_text', 'do_shortcode');
-        add_filter('term_description', 'do_shortcode');
     }
 
     /**
@@ -306,7 +303,7 @@ class Tuutor_Display
         ), $atts, 'tuutor_featured_video');
 
         $post_id = !empty($atts['id']) ? intval($atts['id']) : get_the_ID();
-        
+
         if (!$post_id) {
             return '';
         }
