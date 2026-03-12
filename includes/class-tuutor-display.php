@@ -16,6 +16,11 @@ class Tuutor_Display
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_shortcode('tuutor_trainings', array($this, 'render_trainings_archive'));
         add_shortcode('tuutor_featured_video', array($this, 'render_featured_video_shortcode'));
+
+        // Enable shortcodes in widgets and descriptions
+        add_filter('widget_text', 'do_shortcode');
+        add_filter('widget_custom_html_content', 'do_shortcode');
+        add_filter('term_description', 'do_shortcode');
     }
 
     /**
@@ -325,7 +330,7 @@ class Tuutor_Display
         $youtube_id = isset($match[1]) ? $match[1] : '';
 
         if ($youtube_id) {
-            return '<div class="tuutor-youtube-embed"><iframe width="100%" height="400" src="https://www.youtube.com/embed/' . esc_attr($youtube_id) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+            return '<div class="tuutor-featured-video"><div class="tuutor-youtube-embed"><iframe src="https://www.youtube.com/embed/' . esc_attr($youtube_id) . '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>';
         }
 
         return '';

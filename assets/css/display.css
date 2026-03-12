@@ -64,6 +64,32 @@
     transform: scale(1.02);
 }
 
+.tuutor-featured-video {
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: var(--tuutor-radius);
+    overflow: hidden;
+    box-shadow: var(--tuutor-shadow-lg);
+    background: #000;
+}
+
+.tuutor-youtube-embed {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.tuutor-youtube-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
 .tuutor-category-badges {
     display: flex;
     gap: 0.5rem;
