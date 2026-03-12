@@ -61,10 +61,10 @@ class Tuutor_Display
                     if (is_array($blocks)) {
                         $this->render_blocks_ui($blocks);
                     } else {
-                        echo $content;
+                        echo do_shortcode($content);
                     }
                 } else {
-                    echo $content;
+                    echo do_shortcode($content);
                 }
                 ?>
             </div>
@@ -85,7 +85,7 @@ class Tuutor_Display
                 <?php
                 switch ($block['type']) {
                     case 'text':
-                        echo wp_kses_post($block['content']);
+                        echo do_shortcode(wp_kses_post($block['content']));
                         break;
                     case 'image':
                         $width = !empty($block['width']) ? $block['width'] : '100%';
@@ -108,7 +108,7 @@ class Tuutor_Display
                         foreach ($block['columns'] as $col) {
                             echo '<div class="tuutor-grid-col">';
                             if ($col['type'] === 'text') {
-                                echo wp_kses_post($col['content']);
+                                echo do_shortcode(wp_kses_post($col['content']));
                             } else if ($col['type'] === 'image') {
                                 echo '<img src="' . esc_url($col['url']) . '" alt="' . esc_attr($col['alt'] ?? '') . '">';
                             } else if ($col['type'] === 'youtube') {
@@ -298,7 +298,12 @@ class Tuutor_Display
      */
     public function render_featured_video_shortcode($atts)
     {
-        $post_id = get_the_ID();
+        $atts = shortcode_atts(array(
+            'id' => '',
+        ), $atts, 'tuutor_featured_video');
+
+        $post_id = !empty($atts['id']) ? intval($atts['id']) : get_the_ID();
+        
         if (!$post_id) {
             return '';
         }

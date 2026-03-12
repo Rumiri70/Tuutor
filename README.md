@@ -57,10 +57,11 @@ This shortcode retrieves the URL saved in the "Featured YouTube Video URL" field
 
 **Usage:**
 ```html
-[tuutor_featured_video]
+[tuutor_featured_video id="123"]
 ```
 
-**Note:** This shortcode must be used within the context of a single `courses` post (e.g., on the single course page or within a template loop for that course) as it relies on `get_the_ID()` to fetch the correct video URL.
+**Attributes:**
+-   `id` (optional): The ID of the training post. If omitted, the shortcode will attempt to fetch the video for the current global post using `get_the_ID()`. Useful when placing the video outside the main loop.
 
 ## Folder Structure
 
